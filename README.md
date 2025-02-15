@@ -10,15 +10,9 @@ Flux is an open-source Spotify Connect music player built on a Raspberry Pi Zero
 
 ## Hardware
 - **Main Computer:** Raspberry Pi Zero 2W
-- **Display:** 1.8-inch LCD screen
+- **Display:** 1.8-inch LCD Screen
 - **Controls:** Physical buttons and volume knobs
 - **Audio:** Dedicated DAC for high-fidelity output
-
-## Setup
-1. Clone this repository.
-2. Install and configure spotifyd on your Pi.
-3. Connect the LCD, buttons, knobs, and DAC.
-4. Build and run the custom UI using Python or C++.
 
 ## Contributing
 Contributions are welcome! Feel free to fork and submit pull requests.
