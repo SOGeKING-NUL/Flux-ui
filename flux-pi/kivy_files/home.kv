@@ -1,0 +1,105 @@
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        
+        # Title Bar
+        BoxLayout:
+            size_hint_y: 0.1
+            canvas.before:
+                Color:
+                    rgb: 0, 1, 0  # Green text color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            Label:
+                id: title_label
+                text: "Flux3.14"
+                font_size: '24sp'
+                color: 0, 1, 0, 1  # Green
+                bold: True
+            Image:
+                source: "assets/wifi_icon.png"
+                size_hint_x: 0.1
+                allow_stretch: True
+                keep_ratio: True
+                pos_hint: {'right': 1}
+        
+        # Main Menu
+        ScrollView:
+            GridLayout:
+                id: menu_grid
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 5
+                
+                # Menu items (Artist, Albums, etc.)
+                Button:
+                    text: "Artists"
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0, 0, 0, 0  # Transparent background
+                    canvas.before:
+                        Color:
+                            rgba: (0, 1, 0, 1) if self.state == 'down' else (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_press: root.on_menu_select("Artists")
+                    on_enter: root.on_hover("Artists")
+                
+                Button:
+                    text: "Albums"
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0, 0, 0, 0
+                    canvas.before:
+                        Color:
+                            rgba: (0, 1, 0, 1) if self.state == 'down' else (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_press: root.on_menu_select("Albums")
+                    on_enter: root.on_hover("Albums")
+                
+                Button:
+                    text: "New Releases"
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0, 0, 0, 0
+                    canvas.before:
+                        Color:
+                            rgba: (0, 1, 0, 1) if self.state == 'down' else (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_press: root.on_menu_select("New Releases")
+                    on_enter: root.on_hover("New Releases")
+                
+                Button:
+                    text: "Playlists"
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0, 0, 0, 0
+                    canvas.before:
+                        Color:
+                            rgba: (0, 1, 0, 1) if self.state == 'down' else (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_press: root.on_menu_select("Playlists")
+                    on_enter: root.on_hover("Playlists")
+                
+                Button:
+                    text: "Search"
+                    size_hint_y: None
+                    height: 50
+                    background_color: 0, 0, 0, 0
+                    canvas.before:
+                        Color:
+                            rgba: (0, 1, 0, 1) if self.state == 'down' else (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_press: root.on_menu_select("Search")
+                    on_enter: root.on_hover("Search")
