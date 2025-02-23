@@ -1,2 +1,3 @@
 # virtual environment
-kivyenv
+.env
+spotipy_gui/spotipy-pi/*

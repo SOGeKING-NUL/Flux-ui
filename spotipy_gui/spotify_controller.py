@@ -101,3 +101,76 @@ def is_track_liked(track_id):
     """Check if a track is saved in the user's library"""
     return sp.current_user_saved_tracks_contains([track_id])[0] 
      
+def get_library(sp):
+    """
+    Retrieve the current user's playlists and saved albums from Spotify.
+
+    Args:
+        sp: An authenticated Spotipy client instance.
+
+    Returns:
+        A tuple (playlist_links, album_links) where:
+            - playlist_links is a dict mapping a playlist's Spotify URL to its name.
+            - album_links is a dict mapping an album's Spotify URL to its name.
+    """
+    # Get playlists as a dict mapping URL -> name
+    playlist_links = {}
+    results = sp.current_user_playlists(limit=50)
+    while results:
+        for playlist in results.get('items', []):
+            # Get the Spotify URL and name for each playlist
+            url = playlist.get('external_urls', {}).get('spotify')
+            if url:
+                playlist_links[url] = playlist.get('name', 'Unknown')
+        # Get the next page of results if available
+        results = sp.next(results) if results.get('next') else None
+
+    # Get saved albums as a dict mapping URL -> name
+    album_links = {}
+    results = sp.current_user_saved_albums(limit=50)
+    while results:
+        for item in results.get('items', []):
+            album = item.get('album', {})
+            url = album.get('external_urls', {}).get('spotify')
+            if url:
+                album_links[url] = album.get('name', 'Unknown')
+        # Get the next page of results if available
+        results = sp.next(results) if results.get('next') else None
+
+    return playlist_links, album_links
+
+
+def play_context_by_url(sp, url, device_name="PiPiece"):
+    """
+    Given a Spotify URL for a playlist or album, convert it to the corresponding Spotify
+    context URI and start playback for that context.
+
+    Args:
+        sp: An authenticated Spotipy client instance.
+        url: A Spotify URL (e.g., 'https://open.spotify.com/playlist/xxx' or 'https://open.spotify.com/album/xxx').
+        device_name: The device to transfer playback to (default is "PiPiece").
+
+    Returns:
+        A message indicating whether playback was successfully started or if an error occurred.
+    """
+    # Transfer playback to the desired device (assumes activate_spotifyd_device is defined)
+    transfer_message = activate_spotifyd_device(device_name)
+    print(transfer_message)
+
+    # Remove any query parameters (e.g., '?si=...') from the URL.
+    base_url = url.split('?')[0]
+
+    # Convert the URL to a Spotify URI.
+    # Example: "https://open.spotify.com/playlist/abc123" becomes "spotify:playlist:abc123"
+    context_uri = base_url.replace("https://open.spotify.com/", "spotify:").replace("/", ":")
+
+    try:
+        sp.start_playback(context_uri=context_uri)
+        return f"Playback started for context: {context_uri}"
+    except Exception as e:
+        return f"Failed to start playback: {e}"
+
+# Example usage:
+# playlists, albums = get_library(sp)
+# message = play_context_by_url(sp, "https://open.spotify.com/playlist/abc123")
+# print(message)
