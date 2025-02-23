@@ -10,7 +10,6 @@ from kivymd.uix.snackbar import Snackbar
 
 from spotify_controller import get_library, play_context_by_url, sp
 
-# Set the initial window size to 240x320 pixels
 Window.size = (240, 320)
 
 KV = '''
@@ -49,12 +48,11 @@ class LibraryGUI(MDApp):
         try:
             playlists, albums = get_library(sp)
         except Exception as e:
-            print("Error retrieving library:", e)
+            self.show_snackbar(f"Library Error: {str(e)}")
             return
 
         library_list = self.root.ids.library_list
 
-        # Add header for Playlists
         library_list.add_widget(self._create_header("Playlists"))
         for url, name in playlists.items():
             item = OneLineListItem(
@@ -63,14 +61,12 @@ class LibraryGUI(MDApp):
             )
             library_list.add_widget(item)
 
-        # Add header for Albums
         library_list.add_widget(self._create_header("Albums"))
         for url, name in albums.items():
             item = OneLineListItem(
                 text=name,
                 on_release=lambda inst, url=url: self.play_context(url)
             )
-            # Set album items' text color to green.
             item.theme_text_color = "Custom"
             item.text_color = (0, 1, 0, 1)
             library_list.add_widget(item)
@@ -89,12 +85,19 @@ class LibraryGUI(MDApp):
         )
 
     def play_context(self, url):
-        # Run the playback call in a separate thread to keep the UI responsive.
-        threading.Thread(target=self._play_context_thread, args=(url,)).start()
+        threading.Thread(
+            target=self._play_context_thread,
+            args=(url,),
+            daemon=True
+        ).start()
 
     def _play_context_thread(self, url):
-        result = play_context_by_url(sp, url)
-        Clock.schedule_once(lambda dt: self.show_snackbar(result), 0)
+        try:
+            result = play_context_by_url(sp, url)
+        except Exception as e:
+            result = f"Error: {str(e)}"
+        finally:
+            Clock.schedule_once(lambda dt: self.show_snackbar(result), 0)
 
     def show_snackbar(self, message):
         Snackbar(text=message, duration=3).open()

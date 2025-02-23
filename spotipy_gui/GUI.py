@@ -30,7 +30,7 @@ Window.size = (240, 320)
 Window.clearcolor = (0, 0, 0, 1)
 
 # -----------------------------------
-# MarqueeLabel Implementation (same as before)
+# MarqueeLabel Implementation
 # -----------------------------------
 class MarqueeLabel(RelativeLayout):
     text = StringProperty("")
@@ -83,6 +83,7 @@ class MarqueeLabel(RelativeLayout):
 # -----------------------------------
 KV = '''
 #:import dp kivy.metrics.dp
+#:import MarqueeLabel __main__.MarqueeLabel
 
 <LibraryOverlay@BoxLayout>:
     orientation: "vertical"
@@ -220,13 +221,18 @@ class CombinedSpotifyGUI(MDApp):
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Green"
         self.root = Builder.load_string(KV)
+        # Cache library data at startup
+        try:
+            self.cached_playlists, self.cached_albums = get_library(sp)
+        except Exception as e:
+            print("Error retrieving library:", e)
+            self.cached_playlists, self.cached_albums = {}, {}
         Window.bind(on_key_down=self.on_key_down)
         Clock.schedule_interval(self.update_play_song_ui, 1)
         return self.root
 
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
-        # Enter key (key code 13) toggles the library overlay.
-        if key == 13:
+        if key == 13:  # Enter key
             self.toggle_library_overlay()
         return False
 
@@ -243,27 +249,19 @@ class CombinedSpotifyGUI(MDApp):
             anim.start(overlay)
 
     def populate_library_list(self):
-        try:
-            playlists, albums = get_library(sp)
-        except Exception as e:
-            print("Error retrieving library:", e)
-            return
-
         lib_list = self.root.ids.library_overlay.ids.library_list
         lib_list.clear_widgets()
-
         header = self._create_header("Playlists")
         lib_list.add_widget(header)
-        for url, name in playlists.items():
+        for url, name in self.cached_playlists.items():
             item = OneLineListItem(
                 text=name,
                 on_release=lambda inst, url=url: self.on_library_item_select(url)
             )
             lib_list.add_widget(item)
-
         header = self._create_header("Albums")
         lib_list.add_widget(header)
-        for url, name in albums.items():
+        for url, name in self.cached_albums.items():
             item = OneLineListItem(
                 text=name,
                 on_release=lambda inst, url=url: self.on_library_item_select(url)
@@ -293,7 +291,10 @@ class CombinedSpotifyGUI(MDApp):
         anim.start(overlay)
 
     def _play_context_thread(self, url):
-        result = play_context_by_url(sp, url)
+        try:
+            result = play_context_by_url(sp, url)
+        except Exception as e:
+            result = f"Error: {str(e)}"
         Clock.schedule_once(lambda dt: self.show_snackbar(result), 0)
 
     def update_play_song_ui(self, dt):

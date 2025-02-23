@@ -169,8 +169,3 @@ def play_context_by_url(sp, url, device_name="PiPiece"):
         return f"Playback started for context: {context_uri}"
     except Exception as e:
         return f"Failed to start playback: {e}"
-
-# Example usage:
-# playlists, albums = get_library(sp)
-# message = play_context_by_url(sp, "https://open.spotify.com/playlist/abc123")
-# print(message)
