@@ -1,0 +1,5 @@
+spotipy
+kivy
+kivymd
+dotenv
+

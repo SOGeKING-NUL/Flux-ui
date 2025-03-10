@@ -1,0 +1,4 @@
+# virtual environment
+.env
+spotipy_gui/spotipy-pi
+spotipy_gui/__pycache__/
